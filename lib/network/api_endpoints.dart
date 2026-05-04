@@ -5,6 +5,6 @@ class ApiEndpoints {
   // Authentication Endpoints
   static const String login = '$baseUrl/Login/Login_Check';
   
-  // Add other endpoints here in the future
-  // static const String register = '$baseUrl/register';
+  // Dashboard Endpoints
+  static const String dashboard = '$baseUrl/user/Get_Dashboard/';
 }

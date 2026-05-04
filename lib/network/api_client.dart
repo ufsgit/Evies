@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'api_endpoints.dart';
 
 class ApiClient {
@@ -15,8 +16,15 @@ class ApiClient {
     ));
 
     _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) {
-        // Do something before request is sent
+      onRequest: (options, handler) async {
+        // Fetch token from SharedPreferences and attach it to headers
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('jwt_token');
+        
+        if (token != null && token.isNotEmpty) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
+        
         return handler.next(options); 
       },
       onResponse: (response, handler) {
