@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../controllers/dashboard_controller.dart';
 import '../models/dashboard_model.dart';
+import 'student_lead_view.dart';
 
 class DashboardView extends StatelessWidget {
   DashboardView({super.key});
@@ -39,6 +40,15 @@ class DashboardView extends StatelessWidget {
                 ),
               ),
             ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 12.0),
+                child: IconButton(
+                  icon: const Icon(Icons.group_add_rounded, color: Colors.white, size: 24),
+                  onPressed: () => Get.to(() => StudentLeadView()),
+                ),
+              ),
+            ],
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(30),
@@ -174,10 +184,10 @@ class DashboardView extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(Icons.dashboard_rounded, 'Home', true),
-                _buildNavItem(Icons.bar_chart_rounded, 'Stats', false),
-                _buildNavItem(Icons.search_rounded, 'Search', false),
-                _buildNavItem(Icons.person_rounded, 'Profile', false),
+                _buildNavItem(Icons.dashboard_rounded, 'Home', true, onTap: () {}),
+                _buildNavItem(Icons.bar_chart_rounded, 'Stats', false, onTap: () {}),
+                _buildNavItem(Icons.people_alt_rounded, 'Leads', false, onTap: () => Get.to(() => StudentLeadView())),
+                _buildNavItem(Icons.person_rounded, 'Profile', false, onTap: () {}),
               ],
             ),
           ),
@@ -233,7 +243,10 @@ class DashboardView extends StatelessWidget {
               children: [
                 _buildDrawerItem(Icons.dashboard_rounded, 'Dashboard', true),
                 _buildDrawerItem(Icons.school_rounded, 'My Courses', false),
-                _buildDrawerItem(Icons.people_rounded, 'Student Leads', false),
+                _buildDrawerItem(Icons.people_rounded, 'Student Leads', false, onTap: () {
+                  Get.back();
+                  Get.to(() => StudentLeadView());
+                }),
                 _buildDrawerItem(Icons.analytics_rounded, 'Reports', false),
                 _buildDrawerItem(Icons.settings_rounded, 'Settings', false),
                 const Divider(indent: 20, endIndent: 20),
@@ -246,7 +259,7 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem(IconData icon, String title, bool isActive, {Color? color}) {
+  Widget _buildDrawerItem(IconData icon, String title, bool isActive, {Color? color, VoidCallback? onTap}) {
     return ListTile(
       leading: Icon(
         icon,
@@ -260,7 +273,7 @@ class DashboardView extends StatelessWidget {
           color: color ?? (isActive ? const Color(0xFF5C6BC0) : const Color(0xFF212121)),
         ),
       ),
-      onTap: () {
+      onTap: onTap ?? () {
         // Handle navigation
         Get.back();
       },
@@ -269,11 +282,13 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, bool isActive) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
+  Widget _buildNavItem(IconData icon, String label, bool isActive, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
         Icon(
           icon,
           color: isActive ? const Color(0xFF5C6BC0) : const Color(0xFFBDBDBD),
@@ -289,8 +304,9 @@ class DashboardView extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildSectionTitle(String title) {
     return Text(

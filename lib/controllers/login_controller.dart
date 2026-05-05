@@ -45,6 +45,9 @@ class LoginController extends GetxController {
       if (response.token != null) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('jwt_token', response.token!);
+        if (response.user != null) {
+          await prefs.setInt('user_id', response.user!.id);
+        }
       }
 
       Get.snackbar(

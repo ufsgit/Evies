@@ -4,7 +4,10 @@ class ApiEndpoints {
 
   // Authentication Endpoints
   static const String login = '$baseUrl/Login/Login_Check';
-  
+
   // Dashboard Endpoints
   static const String dashboard = '$baseUrl/user/Get_Dashboard/';
+
+  // Student Endpoints
+  static const String getStudentLeads = '$baseUrl/student/Search_student_lead/';
 }
