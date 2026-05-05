@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/student_lead_model.dart';
+import '../models/dropdown_models.dart';
 import '../network/student_lead_repository.dart';
 
 class StudentLeadController extends GetxController {
@@ -12,11 +13,34 @@ class StudentLeadController extends GetxController {
   var filteredLeads = <StudentLead>[].obs;
   var totalLeads = 0.obs;
   var currentPage = 1.obs;
-  var itemsPerPage = 10.obs; // Based on your response showing 10 items
+  var itemsPerPage = 20.obs;
+
+  // Dropdown Data
+  var branches = <BranchModel>[].obs;
+  var staff = <StaffModel>[].obs;
+  var statuses = <FollowupStatusModel>[].obs;
+
+  // Selected Filters
+  var searchTerm = ''.obs;
+  var selectedStaffId = Rxn<int>();
+  var selectedBranchId = Rxn<int>();
+  var selectedStatus = 'all'.obs;
 
   @override
   void onInit() {
     super.onInit();
+    loadDropdowns();
+    fetchStudentLeads();
+  }
+
+  void loadDropdowns() async {
+    branches.value = await _repository.fetchBranches();
+    staff.value = await _repository.fetchStaff();
+    statuses.value = await _repository.fetchFollowupStatuses();
+  }
+
+  void onSearchChange() {
+    currentPage.value = 1;
     fetchStudentLeads();
   }
 
@@ -25,7 +49,14 @@ class StudentLeadController extends GetxController {
       isLoading(true);
       isError(false);
       
-      final response = await _repository.fetchStudentLeads(page: currentPage.value);
+      final response = await _repository.fetchStudentLeads(
+        page: currentPage.value,
+        searchTerm: searchTerm.value,
+        staffId: selectedStaffId.value,
+        branchId: selectedBranchId.value,
+        status: selectedStatus.value,
+      );
+      
       if (response != null) {
         leads.assignAll(response.leads);
         filteredLeads.assignAll(response.leads);

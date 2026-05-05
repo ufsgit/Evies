@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../controllers/student_lead_controller.dart';
 import '../controllers/enquiry_controller.dart';
 import '../models/student_lead_model.dart';
+import '../models/dropdown_models.dart';
 
 import '../utils/app_theme.dart';
 import 'widgets/enquiry_form_popup.dart';
@@ -63,7 +64,10 @@ class StudentLeadView extends StatelessWidget {
                       boxShadow: AppTheme.softShadow,
                     ),
                     child: TextField(
-                      onChanged: controller.filterLeads,
+                      onChanged: (val) {
+                        controller.searchTerm.value = val;
+                        controller.onSearchChange();
+                      },
                       decoration: InputDecoration(
                         hintText: 'Search by name or contact...',
                         hintStyle: AppTheme.hintStyle,
@@ -80,17 +84,49 @@ class StudentLeadView extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  // Filter Chips (Placeholder for Staff, Status, Branch)
+                  // Filter Chips
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        _buildFilterChip('All Staff', Icons.person_outline),
-                        _buildFilterChip('All Followups', Icons.event_note),
-                        _buildFilterChip(
-                          'All Branches',
-                          Icons.account_tree_outlined,
-                        ),
+                        // Staff Filter
+                        Obx(() => _buildDropdownChip<StaffModel?>(
+                          label: controller.selectedStaffId.value == null 
+                              ? 'All Staff' 
+                              : controller.staff.firstWhere((s) => s.id == controller.selectedStaffId.value, orElse: () => StaffModel(id: 0, name: 'Unknown')).name,
+                          icon: Icons.person_search_rounded,
+                          items: controller.staff,
+                          onSelected: (staff) {
+                            controller.selectedStaffId.value = staff?.id;
+                            controller.onSearchChange();
+                          },
+                        )),
+                        
+                        // Status Filter
+                        Obx(() => _buildDropdownChip<FollowupStatusModel?>(
+                          label: controller.selectedStatus.value == 'all' 
+                              ? 'All Followups' 
+                              : controller.statuses.firstWhere((s) => s.id.toString() == controller.selectedStatus.value, orElse: () => FollowupStatusModel(id: 0, name: 'Unknown')).name,
+                          icon: Icons.history_rounded,
+                          items: controller.statuses,
+                          onSelected: (status) {
+                            controller.selectedStatus.value = status?.id.toString() ?? 'all';
+                            controller.onSearchChange();
+                          },
+                        )),
+                        
+                        // Branch Filter
+                        Obx(() => _buildDropdownChip<BranchModel?>(
+                          label: controller.selectedBranchId.value == null 
+                              ? 'All Branches' 
+                              : controller.branches.firstWhere((b) => b.id == controller.selectedBranchId.value, orElse: () => BranchModel(id: 0, name: 'Unknown')).name,
+                          icon: Icons.location_on_rounded,
+                          items: controller.branches,
+                          onSelected: (branch) {
+                            controller.selectedBranchId.value = branch?.id;
+                            controller.onSearchChange();
+                          },
+                        )),
                       ],
                     ),
                   ),
@@ -240,29 +276,60 @@ class StudentLeadView extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterChip(String label, IconData icon) {
-    return Container(
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppTheme.cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade100),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: AppTheme.subtitleColor),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: AppTheme.subtitle.copyWith(color: const Color(0xFF424242)),
+  Widget _buildDropdownChip<T>({
+    required String label,
+    required IconData icon,
+    required List<T> items,
+    required Function(T) onSelected,
+  }) {
+    return PopupMenuButton<T>(
+      offset: const Offset(0, 45),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      onSelected: onSelected,
+      itemBuilder: (context) => [
+        // "All" option
+        PopupMenuItem<T>(
+          value: null as T,
+          child: Text(
+            label.startsWith('All') ? label : 'Clear Filter',
+            style: AppTheme.bodyText.copyWith(color: AppTheme.primaryColor),
           ),
-          const Icon(
-            Icons.keyboard_arrow_down_rounded,
-            size: 16,
-            color: AppTheme.subtitleColor,
-          ),
-        ],
+        ),
+        ...items.map((item) {
+          String itemName = '';
+          if (item is StaffModel) itemName = item.name;
+          if (item is BranchModel) itemName = item.name;
+          if (item is FollowupStatusModel) itemName = item.name;
+
+          return PopupMenuItem<T>(
+            value: item,
+            child: Text(itemName, style: AppTheme.bodyText),
+          );
+        }),
+      ],
+      child: Container(
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppTheme.cardColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade100),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 16, color: AppTheme.subtitleColor),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: AppTheme.subtitle.copyWith(color: const Color(0xFF424242)),
+            ),
+            const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 16,
+              color: AppTheme.subtitleColor,
+            ),
+          ],
+        ),
       ),
     );
   }

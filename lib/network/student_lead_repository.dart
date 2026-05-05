@@ -1,14 +1,27 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../models/student_lead_model.dart';
+import '../models/dropdown_models.dart';
 import 'api_client.dart';
 import 'api_endpoints.dart';
 
 class StudentLeadRepository {
   final ApiClient _apiClient = ApiClient();
 
-  Future<StudentLeadResponseModel?> fetchStudentLeads({int page = 1}) async {
+  Future<StudentLeadResponseModel?> fetchStudentLeads({
+    int page = 1,
+    String searchTerm = '',
+    int? staffId,
+    int? branchId,
+    String? status,
+  }) async {
     try {
-      final url = '${ApiEndpoints.getStudentLeads}?page=$page';
+      String url = '${ApiEndpoints.getStudentLeads}?page=$page&pageSize=20';
+      if (searchTerm.isNotEmpty) url += '&student_Name=$searchTerm';
+      if (staffId != null) url += '&assignedStaffId=$staffId';
+      if (branchId != null) url += '&branchId=$branchId';
+      if (status != null && status != 'all') url += '&activeStatus=$status';
+      url += '&enrollment_status=all'; 
+
       debugPrint('--- STUDENT LEADS API REQUEST ---');
       debugPrint('Endpoint: $url');
       debugPrint('-------------------');
@@ -17,15 +30,48 @@ class StudentLeadRepository {
 
       if (response.statusCode == 200) {
         debugPrint('--- STUDENT LEADS API RESPONSE ---');
-        debugPrint(response.data.toString());
         return StudentLeadResponseModel.fromJson(response.data);
-      } else {
-        debugPrint('Error fetching student leads: ${response.statusCode}');
-        return null;
       }
+      return null;
     } catch (e) {
       debugPrint('Exception in fetchStudentLeads: $e');
       return null;
+    }
+  }
+
+  Future<List<BranchModel>> fetchBranches() async {
+    try {
+      final response = await _apiClient.dio.get(ApiEndpoints.branchDropdown);
+      if (response.statusCode == 200 && response.data is List) {
+        return (response.data as List).map((e) => BranchModel.fromJson(e)).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<StaffModel>> fetchStaff() async {
+    try {
+      final response = await _apiClient.dio.get(ApiEndpoints.userDropdown);
+      if (response.statusCode == 200 && response.data is List) {
+        return (response.data as List).map((e) => StaffModel.fromJson(e)).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<FollowupStatusModel>> fetchFollowupStatuses() async {
+    try {
+      final response = await _apiClient.dio.get(ApiEndpoints.getFollowupStatus);
+      if (response.statusCode == 200 && response.data is List) {
+        return (response.data as List).map((e) => FollowupStatusModel.fromJson(e)).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
     }
   }
 
@@ -36,7 +82,7 @@ class StudentLeadRepository {
         if (response.data is List) {
           return List<Map<String, dynamic>>.from(response.data);
         } else if (response.data is Map && response.data.containsKey('data')) {
-           return List<Map<String, dynamic>>.from(response.data['data']);
+          return List<Map<String, dynamic>>.from(response.data['data']);
         }
       }
       return [];
@@ -58,7 +104,6 @@ class StudentLeadRepository {
       return null;
     }
   }
-
 
   Future<bool> saveStudent(Map<String, dynamic> data) async {
     try {
