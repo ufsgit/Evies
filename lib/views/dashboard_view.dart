@@ -8,6 +8,7 @@ import '../models/dashboard_model.dart';
 import '../utils/app_theme.dart';
 import 'login_view.dart';
 import 'student_lead_view.dart';
+import 'call_log_view.dart';
 
 class DashboardView extends StatelessWidget {
   DashboardView({super.key});
@@ -238,16 +239,14 @@ class DashboardView extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 10),
               children: [
-                _buildDrawerItem(Icons.dashboard_rounded, 'Home', true),
-                _buildDrawerItem(
-                  Icons.people_rounded,
-                  'Student Leads',
-                  false,
-                  onTap: () {
-                    Get.back();
-                    Get.to(() => StudentLeadView());
-                  },
-                ),
+                _buildDrawerItem(Icons.dashboard_rounded, 'Dashboard', true),
+                _buildDrawerItem(Icons.school_rounded, 'My Courses', false),
+                _buildDrawerItem(Icons.people_rounded, 'Student Leads', false, onTap: () {
+                  Get.back();
+                  Get.to(() => StudentLeadView());
+                }),
+                _buildDrawerItem(Icons.analytics_rounded, 'Reports', false),
+                _buildDrawerItem(Icons.settings_rounded, 'Settings', false),
                 const Divider(indent: 20, endIndent: 20),
                 _buildDrawerItem(
                   Icons.logout_rounded,
