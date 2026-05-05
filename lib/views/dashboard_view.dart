@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../controllers/dashboard_controller.dart';
 import '../models/dashboard_model.dart';
 import '../utils/app_theme.dart';
+import 'login_view.dart';
 import 'student_lead_view.dart';
 import 'call_log_view.dart';
 
@@ -29,14 +31,22 @@ class DashboardView extends StatelessWidget {
             backgroundColor: const Color(0xFF5C6BC0),
             leading: Builder(
               builder: (context) => Padding(
-                padding: const EdgeInsets.only(left: 12.0, top: 8.0, bottom: 8.0),
+                padding: const EdgeInsets.only(
+                  left: 12.0,
+                  top: 8.0,
+                  bottom: 8.0,
+                ),
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
-                    icon: const Icon(Icons.menu_rounded, color: Colors.white, size: 22),
+                    icon: const Icon(
+                      Icons.menu_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
                     onPressed: () => Scaffold.of(context).openDrawer(),
                   ),
                 ),
@@ -46,7 +56,11 @@ class DashboardView extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 12.0),
                 child: IconButton(
-                  icon: const Icon(Icons.group_add_rounded, color: Colors.white, size: 24),
+                  icon: const Icon(
+                    Icons.group_add_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                   onPressed: () => Get.to(() => StudentLeadView()),
                 ),
               ),
@@ -58,10 +72,7 @@ class DashboardView extends StatelessWidget {
               ),
             ),
             flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'Dashboard',
-                style: AppTheme.appBarTitle,
-              ),
+              title: Text('Dashboard', style: AppTheme.appBarTitle),
               background: Container(
                 decoration: const BoxDecoration(
                   borderRadius: AppTheme.curvedBorder,
@@ -77,7 +88,7 @@ class DashboardView extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Body Content
           SliverToBoxAdapter(
             child: Obx(() {
@@ -85,21 +96,24 @@ class DashboardView extends StatelessWidget {
                 return const Padding(
                   padding: EdgeInsets.only(top: 100.0),
                   child: Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF5C6BC0),
-                    ),
+                    child: CircularProgressIndicator(color: Color(0xFF5C6BC0)),
                   ),
                 );
               }
 
-              if (controller.isError.value || controller.dashboardData.value == null) {
+              if (controller.isError.value ||
+                  controller.dashboardData.value == null) {
                 return Padding(
                   padding: const EdgeInsets.only(top: 100.0),
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
+                        const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Colors.redAccent,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           'Failed to load dashboard',
@@ -130,7 +144,10 @@ class DashboardView extends StatelessWidget {
                     // Leads & Students Bar Chart
                     _buildSectionTitle('Lead & Student Growth'),
                     const SizedBox(height: 16),
-                    _buildLeadsStudentsBarChart(data.leadCounts, data.studentCounts),
+                    _buildLeadsStudentsBarChart(
+                      data.leadCounts,
+                      data.studentCounts,
+                    ),
                     const SizedBox(height: 32),
 
                     // Course Analytics Line Chart
@@ -161,10 +178,18 @@ class DashboardView extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(Icons.dashboard_rounded, 'Home', true, onTap: () {}),
-                _buildNavItem(Icons.bar_chart_rounded, 'Stats', false, onTap: () {}),
-                _buildNavItem(Icons.people_alt_rounded, 'Leads', false, onTap: () => Get.to(() => StudentLeadView())),
-                _buildNavItem(Icons.person_rounded, 'Profile', false, onTap: () {}),
+                _buildNavItem(
+                  Icons.dashboard_rounded,
+                  'Home',
+                  true,
+                  onTap: () {},
+                ),
+                _buildNavItem(
+                  Icons.people_alt_rounded,
+                  'Leads',
+                  false,
+                  onTap: () => Get.to(() => StudentLeadView()),
+                ),
               ],
             ),
           ),
@@ -185,9 +210,7 @@ class DashboardView extends StatelessWidget {
       child: Column(
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(
-              gradient: AppTheme.primaryGradient,
-            ),
+            decoration: const BoxDecoration(gradient: AppTheme.primaryGradient),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -195,7 +218,11 @@ class DashboardView extends StatelessWidget {
                   const CircleAvatar(
                     radius: 35,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.person_rounded, size: 40, color: Color(0xFF5C6BC0)),
+                    child: Icon(
+                      Icons.person_rounded,
+                      size: 40,
+                      color: Color(0xFF5C6BC0),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -220,15 +247,20 @@ class DashboardView extends StatelessWidget {
                   Get.back();
                   Get.to(() => StudentLeadView());
                 }),
-                _buildDrawerItem(Icons.call_rounded, 'Call Logs', false, onTap: () {
-                  Get.back();
-                  Get.to(() => CallLogView());
-                }),
                 _buildDrawerItem(Icons.analytics_rounded, 'Reports', false),
-
                 _buildDrawerItem(Icons.settings_rounded, 'Settings', false),
                 const Divider(indent: 20, endIndent: 20),
-                _buildDrawerItem(Icons.logout_rounded, 'Logout', false, color: Colors.redAccent),
+                _buildDrawerItem(
+                  Icons.logout_rounded,
+                  'Logout',
+                  false,
+                  color: Colors.redAccent,
+                  onTap: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.clear();
+                    Get.offAll(() => LoginView());
+                  },
+                ),
               ],
             ),
           ),
@@ -237,54 +269,70 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem(IconData icon, String title, bool isActive, {Color? color, VoidCallback? onTap}) {
+  Widget _buildDrawerItem(
+    IconData icon,
+    String title,
+    bool isActive, {
+    Color? color,
+    VoidCallback? onTap,
+  }) {
     return ListTile(
       leading: Icon(
         icon,
-        color: color ?? (isActive ? const Color(0xFF5C6BC0) : const Color(0xFF757575)),
+        color:
+            color ??
+            (isActive ? const Color(0xFF5C6BC0) : const Color(0xFF757575)),
       ),
       title: Text(
         title,
         style: GoogleFonts.inter(
           fontSize: 16,
           fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-          color: color ?? (isActive ? AppTheme.primaryColor : AppTheme.textColor),
+          color:
+              color ?? (isActive ? AppTheme.primaryColor : AppTheme.textColor),
         ),
       ),
-      onTap: onTap ?? () {
-        // Handle navigation
-        Get.back();
-      },
+      onTap:
+          onTap ??
+          () {
+            // Handle navigation
+            Get.back();
+          },
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, bool isActive, {VoidCallback? onTap}) {
+  Widget _buildNavItem(
+    IconData icon,
+    String label,
+    bool isActive, {
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-        Icon(
-          icon,
-          color: isActive ? AppTheme.primaryColor : const Color(0xFFBDBDBD),
-          size: 26,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 11,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+          Icon(
+            icon,
             color: isActive ? AppTheme.primaryColor : const Color(0xFFBDBDBD),
+            size: 26,
           ),
-        ),
-      ],
-    ),
-  );
-}
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+              color: isActive ? AppTheme.primaryColor : const Color(0xFFBDBDBD),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildSectionTitle(String title) {
     return Text(
@@ -318,14 +366,21 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  Widget _buildLeadsStudentsBarChart(List<LeadCount> leads, List<StudentCount> students) {
+  Widget _buildLeadsStudentsBarChart(
+    List<LeadCount> leads,
+    List<StudentCount> students,
+  ) {
     if (leads.isEmpty && students.isEmpty) {
       return const Center(child: Text('No data available'));
     }
 
     final leadVal = leads.isNotEmpty ? leads.first.count.toDouble() : 0.0;
-    final studentVal = students.isNotEmpty ? students.first.count.toDouble() : 0.0;
-    final month = leads.isNotEmpty ? leads.first.month : (students.isNotEmpty ? students.first.month : '');
+    final studentVal = students.isNotEmpty
+        ? students.first.count.toDouble()
+        : 0.0;
+    final month = leads.isNotEmpty
+        ? leads.first.month
+        : (students.isNotEmpty ? students.first.month : '');
 
     return Container(
       height: 250,
@@ -395,15 +450,22 @@ class DashboardView extends StatelessWidget {
                       },
                     ),
                   ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                 ),
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
                   horizontalInterval: 100,
                   getDrawingHorizontalLine: (value) {
-                    return const FlLine(color: Color(0xFFEEEEEE), strokeWidth: 1);
+                    return const FlLine(
+                      color: Color(0xFFEEEEEE),
+                      strokeWidth: 1,
+                    );
                   },
                 ),
                 borderData: FlBorderData(show: false),
@@ -443,7 +505,10 @@ class DashboardView extends StatelessWidget {
       return FlSpot(e.key.toDouble(), e.value.enrollmentCount.toDouble());
     }).toList();
 
-    double maxY = courses.map((c) => c.enrollmentCount).reduce((a, b) => a > b ? a : b).toDouble();
+    double maxY = courses
+        .map((c) => c.enrollmentCount)
+        .reduce((a, b) => a > b ? a : b)
+        .toDouble();
     if (maxY == 0) maxY = 10; // Prevent div by zero on interval
 
     return Container(
@@ -470,7 +535,10 @@ class DashboardView extends StatelessWidget {
                   drawVerticalLine: false,
                   horizontalInterval: (maxY / 5) > 0 ? maxY / 5 : 1,
                   getDrawingHorizontalLine: (value) {
-                    return const FlLine(color: Color(0xFFEEEEEE), strokeWidth: 1);
+                    return const FlLine(
+                      color: Color(0xFFEEEEEE),
+                      strokeWidth: 1,
+                    );
                   },
                 ),
                 titlesData: FlTitlesData(
@@ -485,12 +553,12 @@ class DashboardView extends StatelessWidget {
                         if (index < 0 || index >= courses.length) {
                           return const SizedBox.shrink();
                         }
-                        
+
                         String name = courses[index].courseName;
                         if (name.length > 10) {
                           name = '${name.substring(0, 10)}...';
                         }
-                        
+
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Transform.rotate(
@@ -524,8 +592,12 @@ class DashboardView extends StatelessWidget {
                       },
                     ),
                   ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                 ),
                 borderData: FlBorderData(show: false),
                 minX: 0,
