@@ -6,6 +6,7 @@ import '../controllers/dashboard_controller.dart';
 import '../models/dashboard_model.dart';
 import '../utils/app_theme.dart';
 import 'student_lead_view.dart';
+import 'call_log_view.dart';
 
 class DashboardView extends StatelessWidget {
   DashboardView({super.key});
@@ -219,7 +220,12 @@ class DashboardView extends StatelessWidget {
                   Get.back();
                   Get.to(() => StudentLeadView());
                 }),
+                _buildDrawerItem(Icons.call_rounded, 'Call Logs', false, onTap: () {
+                  Get.back();
+                  Get.to(() => CallLogView());
+                }),
                 _buildDrawerItem(Icons.analytics_rounded, 'Reports', false),
+
                 _buildDrawerItem(Icons.settings_rounded, 'Settings', false),
                 const Divider(indent: 20, endIndent: 20),
                 _buildDrawerItem(Icons.logout_rounded, 'Logout', false, color: Colors.redAccent),
