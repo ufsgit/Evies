@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../controllers/dashboard_controller.dart';
 import '../models/dashboard_model.dart';
+import '../utils/app_theme.dart';
 import 'student_lead_view.dart';
 
 class DashboardView extends StatelessWidget {
@@ -14,7 +15,7 @@ class DashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.backgroundColor,
       drawer: _buildDrawer(),
       body: CustomScrollView(
         slivers: [
@@ -58,25 +59,12 @@ class DashboardView extends StatelessWidget {
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 'Dashboard',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                style: AppTheme.appBarTitle,
               ),
               background: Container(
                 decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                  gradient: LinearGradient(
-                    colors: [
-                      Color(0xFF90CAF9), // Light Blue
-                      Color(0xFFE1BEE7), // Light Purple
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  borderRadius: AppTheme.curvedBorder,
+                  gradient: AppTheme.primaryGradient,
                 ),
                 child: const Center(
                   child: Icon(
@@ -158,27 +146,15 @@ class DashboardView extends StatelessWidget {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 20,
-              offset: const Offset(0, -5),
-            ),
-          ],
+          color: AppTheme.cardColor,
+          borderRadius: AppTheme.curvedTopBorder,
+          boxShadow: AppTheme.navbarShadow,
         ),
         child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
+          borderRadius: AppTheme.curvedTopBorder,
           child: BottomAppBar(
             elevation: 0,
-            color: Colors.white,
+            color: AppTheme.cardColor,
             padding: EdgeInsets.zero,
             height: 70,
             child: Row(
@@ -198,22 +174,18 @@ class DashboardView extends StatelessWidget {
 
   Widget _buildDrawer() {
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
-          topRight: Radius.circular(30),
-          bottomRight: Radius.circular(30),
+          topRight: Radius.circular(AppTheme.borderRadiusValue),
+          bottomRight: Radius.circular(AppTheme.borderRadiusValue),
         ),
       ),
       child: Column(
         children: [
           DrawerHeader(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF90CAF9), Color(0xFFE1BEE7)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              gradient: AppTheme.primaryGradient,
             ),
             child: Center(
               child: Column(
@@ -270,7 +242,7 @@ class DashboardView extends StatelessWidget {
         style: GoogleFonts.inter(
           fontSize: 16,
           fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-          color: color ?? (isActive ? const Color(0xFF5C6BC0) : const Color(0xFF212121)),
+          color: color ?? (isActive ? AppTheme.primaryColor : AppTheme.textColor),
         ),
       ),
       onTap: onTap ?? () {
@@ -291,7 +263,7 @@ class DashboardView extends StatelessWidget {
         children: [
         Icon(
           icon,
-          color: isActive ? const Color(0xFF5C6BC0) : const Color(0xFFBDBDBD),
+          color: isActive ? AppTheme.primaryColor : const Color(0xFFBDBDBD),
           size: 26,
         ),
         const SizedBox(height: 4),
@@ -300,7 +272,7 @@ class DashboardView extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 11,
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-            color: isActive ? const Color(0xFF5C6BC0) : const Color(0xFFBDBDBD),
+            color: isActive ? AppTheme.primaryColor : const Color(0xFFBDBDBD),
           ),
         ),
       ],

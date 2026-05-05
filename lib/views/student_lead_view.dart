@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controllers/student_lead_controller.dart';
 import '../models/student_lead_model.dart';
+import '../utils/app_theme.dart';
 
 class StudentLeadView extends StatelessWidget {
   StudentLeadView({super.key});
@@ -12,7 +13,7 @@ class StudentLeadView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.backgroundColor,
       body: CustomScrollView(
         slivers: [
           // Gradient App Bar
@@ -21,41 +22,24 @@ class StudentLeadView extends StatelessWidget {
             floating: false,
             pinned: true,
             elevation: 0,
-            backgroundColor: const Color(0xFF5C6BC0),
+            backgroundColor: AppTheme.primaryColor,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
               onPressed: () => Get.back(),
             ),
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
-              ),
+              borderRadius: AppTheme.curvedBorder,
             ),
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 'Student Leads',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 18,
-                ),
+                style: AppTheme.appBarTitle,
               ),
               centerTitle: true,
               background: Container(
                 decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                  gradient: LinearGradient(
-                    colors: [
-                      Color(0xFF90CAF9), // Light Blue
-                      Color(0xFFE1BEE7), // Light Purple
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  borderRadius: AppTheme.curvedBorder,
+                  gradient: AppTheme.primaryGradient,
                 ),
               ),
             ),
@@ -70,22 +54,16 @@ class StudentLeadView extends StatelessWidget {
                   // Search Field
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppTheme.cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      boxShadow: AppTheme.softShadow,
                     ),
                     child: TextField(
                       onChanged: controller.filterLeads,
                       decoration: InputDecoration(
                         hintText: 'Search by name or contact...',
-                        hintStyle: GoogleFonts.inter(color: Colors.grey.shade400, fontSize: 14),
-                        prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF5C6BC0)),
+                        hintStyle: AppTheme.hintStyle,
+                        prefixIcon: const Icon(Icons.search_rounded, color: AppTheme.primaryColor),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(vertical: 15),
                       ),
@@ -112,18 +90,11 @@ class StudentLeadView extends StatelessWidget {
                     children: [
                       Obx(() => Text(
                         'Total Results: ${controller.totalLeads.value}',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF5C6BC0),
-                        ),
+                        style: AppTheme.h1.copyWith(fontSize: 14, color: AppTheme.primaryColor),
                       )),
                       Obx(() => Text(
                         'Page ${controller.currentPage.value}',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: Colors.grey.shade500,
-                        ),
+                        style: AppTheme.subtitle,
                       )),
                     ],
                   ),
@@ -219,9 +190,9 @@ class StudentLeadView extends StatelessWidget {
       // Floating Action Button for Add Enquiry
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {},
-        backgroundColor: const Color(0xFF5C6BC0),
+        backgroundColor: AppTheme.primaryColor,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: Text('Add Enquiry', style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white)),
+        label: Text('Add Enquiry', style: AppTheme.bodyText.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
       ),
     );
   }
@@ -231,19 +202,19 @@ class StudentLeadView extends StatelessWidget {
       margin: const EdgeInsets.only(right: 12),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.cardColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade100),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: const Color(0xFF757575)),
+          Icon(icon, size: 16, color: AppTheme.subtitleColor),
           const SizedBox(width: 8),
           Text(
             label,
-            style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF424242), fontWeight: FontWeight.w500),
+            style: AppTheme.subtitle.copyWith(color: const Color(0xFF424242)),
           ),
-          const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: Color(0xFF757575)),
+          const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: AppTheme.subtitleColor),
         ],
       ),
     );
@@ -252,11 +223,11 @@ class StudentLeadView extends StatelessWidget {
   Widget _buildPageButton(IconData icon, VoidCallback? onPressed) {
     return Container(
       decoration: BoxDecoration(
-        color: onPressed != null ? const Color(0xFF5C6BC0).withValues(alpha: 0.1) : Colors.grey.shade100,
+        color: onPressed != null ? AppTheme.primaryColor.withValues(alpha: 0.1) : Colors.grey.shade100,
         borderRadius: BorderRadius.circular(12),
       ),
       child: IconButton(
-        icon: Icon(icon, color: onPressed != null ? const Color(0xFF5C6BC0) : Colors.grey.shade400),
+        icon: Icon(icon, color: onPressed != null ? AppTheme.primaryColor : Colors.grey.shade400),
         onPressed: onPressed,
       ),
     );
@@ -266,15 +237,9 @@ class StudentLeadView extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: AppTheme.cardColor,
+        borderRadius: AppTheme.cardRadius,
+        boxShadow: AppTheme.softShadow,
       ),
       child: Column(
         children: [
@@ -286,10 +251,10 @@ class StudentLeadView extends StatelessWidget {
                 // Avatar
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: const Color(0xFF5C6BC0).withValues(alpha: 0.1),
+                  backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
                   child: Text(
                     lead.firstName[0],
-                    style: GoogleFonts.poppins(color: const Color(0xFF5C6BC0), fontWeight: FontWeight.bold),
+                    style: AppTheme.h1.copyWith(fontSize: 18, color: AppTheme.primaryColor),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -304,11 +269,7 @@ class StudentLeadView extends StatelessWidget {
                         children: [
                           Text(
                             lead.fullName,
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF212121),
-                            ),
+                            style: AppTheme.bodyText.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -318,10 +279,10 @@ class StudentLeadView extends StatelessWidget {
                             ),
                             child: Text(
                               lead.statusName,
-                              style: GoogleFonts.inter(
+                              style: AppTheme.bodyText.copyWith(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF2E7D32),
+                                color: AppTheme.successColor,
                               ),
                             ),
                           ),
@@ -330,7 +291,7 @@ class StudentLeadView extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         lead.phoneNumber,
-                        style: GoogleFonts.inter(fontSize: 13, color: Colors.grey.shade600),
+                        style: AppTheme.subtitle.copyWith(fontSize: 13),
                       ),
                       const SizedBox(height: 12),
                       Row(
@@ -339,14 +300,14 @@ class StudentLeadView extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             'Follow-up: ${lead.followUpDate?.split('T')[0] ?? 'N/A'}',
-                            style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade700),
+                            style: AppTheme.subtitle.copyWith(color: AppTheme.textColor.withValues(alpha: 0.7)),
                           ),
                           const SizedBox(width: 16),
                           Icon(Icons.person_outline_rounded, size: 14, color: Colors.grey.shade400),
                           const SizedBox(width: 4),
                           Text(
                             lead.assignedStaffName,
-                            style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade700),
+                            style: AppTheme.subtitle.copyWith(color: AppTheme.textColor.withValues(alpha: 0.7)),
                           ),
                         ],
                       ),
@@ -365,8 +326,8 @@ class StudentLeadView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
                 borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
+                  bottomLeft: Radius.circular(AppTheme.cardRadiusValue),
+                  bottomRight: Radius.circular(AppTheme.cardRadiusValue),
                 ),
               ),
               child: Row(
@@ -376,11 +337,7 @@ class StudentLeadView extends StatelessWidget {
                   Expanded(
                     child: Text(
                       lead.remark,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                        fontStyle: FontStyle.italic,
-                      ),
+                      style: AppTheme.subtitle.copyWith(fontStyle: FontStyle.italic),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
