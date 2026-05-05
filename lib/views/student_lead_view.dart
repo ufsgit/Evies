@@ -5,14 +5,47 @@ import '../controllers/student_lead_controller.dart';
 import '../controllers/enquiry_controller.dart';
 import '../models/student_lead_model.dart';
 import '../models/dropdown_models.dart';
-
+import 'followup_view.dart';
 import '../utils/app_theme.dart';
-import 'widgets/enquiry_form_popup.dart';
+import 'enquiry_form_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class StudentLeadView extends StatelessWidget {
   StudentLeadView({super.key});
 
   final StudentLeadController controller = Get.put(StudentLeadController());
+
+  Future<void> _makeCall(String phoneNumber) async {
+    final Uri url = Uri.parse('tel:$phoneNumber');
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      } else {
+        Get.snackbar('Error', 'Could not launch dialer');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'An error occurred');
+    }
+  }
+
+  Future<void> _launchWhatsApp(String? countryCode, String phoneNumber) async {
+    String cleanCode = (countryCode ?? '+91').replaceAll('+', '');
+    String cleanPhone = phoneNumber.replaceAll(RegExp(r'\D'), '');
+    final Uri url = Uri.parse('https://wa.me/$cleanCode$cleanPhone');
+
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        Get.snackbar(
+          'Error',
+          'WhatsApp not installed or could not be launched',
+        );
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'An error occurred');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,43 +123,76 @@ class StudentLeadView extends StatelessWidget {
                     child: Row(
                       children: [
                         // Staff Filter
-                        Obx(() => _buildDropdownChip<StaffModel?>(
-                          label: controller.selectedStaffId.value == null 
-                              ? 'All Staff' 
-                              : controller.staff.firstWhere((s) => s.id == controller.selectedStaffId.value, orElse: () => StaffModel(id: 0, name: 'Unknown')).name,
-                          icon: Icons.person_search_rounded,
-                          items: controller.staff,
-                          onSelected: (staff) {
-                            controller.selectedStaffId.value = staff?.id;
-                            controller.onSearchChange();
-                          },
-                        )),
-                        
+                        Obx(
+                          () => _buildDropdownChip<StaffModel?>(
+                            label: controller.selectedStaffId.value == null
+                                ? 'All Staff'
+                                : controller.staff
+                                      .firstWhere(
+                                        (s) =>
+                                            s.id ==
+                                            controller.selectedStaffId.value,
+                                        orElse: () =>
+                                            StaffModel(id: 0, name: 'Unknown'),
+                                      )
+                                      .name,
+                            icon: Icons.person_search_rounded,
+                            items: controller.staff,
+                            onSelected: (staff) {
+                              controller.selectedStaffId.value = staff?.id;
+                              controller.onSearchChange();
+                            },
+                          ),
+                        ),
+
                         // Status Filter
-                        Obx(() => _buildDropdownChip<FollowupStatusModel?>(
-                          label: controller.selectedStatus.value == 'all' 
-                              ? 'All Followups' 
-                              : controller.statuses.firstWhere((s) => s.id.toString() == controller.selectedStatus.value, orElse: () => FollowupStatusModel(id: 0, name: 'Unknown')).name,
-                          icon: Icons.history_rounded,
-                          items: controller.statuses,
-                          onSelected: (status) {
-                            controller.selectedStatus.value = status?.id.toString() ?? 'all';
-                            controller.onSearchChange();
-                          },
-                        )),
-                        
+                        Obx(
+                          () => _buildDropdownChip<FollowupStatusModel?>(
+                            label: controller.selectedStatus.value == 'all'
+                                ? 'All Followups'
+                                : controller.statuses
+                                      .firstWhere(
+                                        (s) =>
+                                            s.id.toString() ==
+                                            controller.selectedStatus.value,
+                                        orElse: () => FollowupStatusModel(
+                                          id: 0,
+                                          name: 'Unknown',
+                                        ),
+                                      )
+                                      .name,
+                            icon: Icons.history_rounded,
+                            items: controller.statuses,
+                            onSelected: (status) {
+                              controller.selectedStatus.value =
+                                  status?.id.toString() ?? 'all';
+                              controller.onSearchChange();
+                            },
+                          ),
+                        ),
+
                         // Branch Filter
-                        Obx(() => _buildDropdownChip<BranchModel?>(
-                          label: controller.selectedBranchId.value == null 
-                              ? 'All Branches' 
-                              : controller.branches.firstWhere((b) => b.id == controller.selectedBranchId.value, orElse: () => BranchModel(id: 0, name: 'Unknown')).name,
-                          icon: Icons.location_on_rounded,
-                          items: controller.branches,
-                          onSelected: (branch) {
-                            controller.selectedBranchId.value = branch?.id;
-                            controller.onSearchChange();
-                          },
-                        )),
+                        Obx(
+                          () => _buildDropdownChip<BranchModel?>(
+                            label: controller.selectedBranchId.value == null
+                                ? 'All Branches'
+                                : controller.branches
+                                      .firstWhere(
+                                        (b) =>
+                                            b.id ==
+                                            controller.selectedBranchId.value,
+                                        orElse: () =>
+                                            BranchModel(id: 0, name: 'Unknown'),
+                                      )
+                                      .name,
+                            icon: Icons.location_on_rounded,
+                            items: controller.branches,
+                            onSelected: (branch) {
+                              controller.selectedBranchId.value = branch?.id;
+                              controller.onSearchChange();
+                            },
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -161,11 +227,7 @@ class StudentLeadView extends StatelessWidget {
           // Lead List
           Obx(() {
             if (controller.isLoading.value) {
-              return const SliverFillRemaining(
-                child: Center(
-                  child: CircularProgressIndicator(color: Color(0xFF5C6BC0)),
-                ),
-              );
+              return SliverFillRemaining(child: AppTheme.loadingIndicator());
             }
 
             if (controller.isError.value) {
@@ -197,13 +259,21 @@ class StudentLeadView extends StatelessWidget {
               );
             }
 
-            return SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  return _buildLeadCard(controller.filteredLeads[index]);
-                }, childCount: controller.filteredLeads.length),
-              ),
+            return SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return Column(
+                  children: [
+                    _buildLeadCard(controller.filteredLeads[index]),
+                    if (index < controller.filteredLeads.length - 1)
+                      const Divider(
+                        height: 1,
+                        indent: 16,
+                        endIndent: 16,
+                        color: Color(0xFFEEEEEE),
+                      ),
+                  ],
+                );
+              }, childCount: controller.filteredLeads.length),
             );
           }),
 
@@ -257,7 +327,7 @@ class StudentLeadView extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           Get.put(EnquiryController()).resetForm();
-          final result = await Get.dialog(EnquiryFormPopup());
+          final result = await Get.to(() => EnquiryFormView());
           if (result == true) {
             controller.fetchStudentLeads();
           }
@@ -356,167 +426,185 @@ class StudentLeadView extends StatelessWidget {
 
   Widget _buildLeadCard(StudentLead lead) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: AppTheme.cardColor,
-        borderRadius: AppTheme.cardRadius,
-        boxShadow: AppTheme.softShadow,
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top Row: Name and Status
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Avatar
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
+                Expanded(
                   child: Text(
-                    lead.firstName[0],
-                    style: AppTheme.h1.copyWith(
-                      fontSize: 18,
-                      color: AppTheme.primaryColor,
+                    lead.fullName.toUpperCase(),
+                    style: AppTheme.bodyText.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
-
-                // Name & Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            lead.fullName,
-                            style: AppTheme.bodyText.copyWith(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () async {
-                              final result = await Get.dialog(
-                                EnquiryFormPopup(
-                                  studentId: lead.studentId,
-                                  lead: lead,
-                                ),
-                              );
-                              if (result == true) {
-                                controller.fetchStudentLeads();
-                              }
-                            },
-
-                            icon: const Icon(
-                              Icons.edit_outlined,
-                              size: 18,
-                              color: AppTheme.primaryColor,
-                            ),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF81C784,
-                              ).withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              lead.statusName,
-                              style: AppTheme.bodyText.copyWith(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.successColor,
-                              ),
-                            ),
-                          ),
-                        ],
+                IconButton(
+                  onPressed: () async {
+                    final result = await Get.to(
+                      () => EnquiryFormView(
+                        studentId: lead.studentId,
+                        lead: lead,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        lead.phoneNumber,
-                        style: AppTheme.subtitle.copyWith(fontSize: 13),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.event_available_rounded,
-                            size: 14,
-                            color: Colors.grey.shade400,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Follow-up: ${lead.followUpDate?.split('T')[0] ?? 'N/A'}',
-                            style: AppTheme.subtitle.copyWith(
-                              color: AppTheme.textColor.withValues(alpha: 0.7),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Icon(
-                            Icons.person_outline_rounded,
-                            size: 14,
-                            color: Colors.grey.shade400,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            lead.assignedStaffName,
-                            style: AppTheme.subtitle.copyWith(
-                              color: AppTheme.textColor.withValues(alpha: 0.7),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                    );
+                    if (result == true) {
+                      controller.fetchStudentLeads();
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.edit_outlined,
+                    size: 16,
+                    color: AppTheme.primaryColor,
+                  ),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8F5E9),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    lead.statusName,
+                    style: AppTheme.bodyText.copyWith(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF2E7D32),
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
 
-          // Remark Section
-          if (lead.remark.isNotEmpty)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(AppTheme.cardRadiusValue),
-                  bottomRight: Radius.circular(AppTheme.cardRadiusValue),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.chat_bubble_outline_rounded,
-                    size: 14,
-                    color: Colors.grey.shade400,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      lead.remark,
-                      style: AppTheme.subtitle.copyWith(
-                        fontStyle: FontStyle.italic,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left Side: Phone and Remark
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Phone Number
+                      const SizedBox(height: 2),
+                      Text(
+                        lead.phoneNumber,
+                        style: AppTheme.subtitle.copyWith(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+
+                      // Remark
+                      if (lead.remark.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          lead.remark,
+                          style: AppTheme.subtitle.copyWith(
+                            fontSize: 12,
+                            color: Colors.grey.shade500,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
                   ),
-                ],
-              ),
+                ),
+
+                // Right Side: Action Icons (Compact Row)
+                Row(
+                  children: [
+                    _buildCompactActionIcon(
+                      Icons.call_outlined,
+                      Colors.blue,
+                      () {
+                        _makeCall(lead.phoneNumber);
+                      },
+                    ),
+                    const SizedBox(width: 4),
+                    _buildCompactActionIcon(
+                      Icons.chat_bubble_outline_rounded,
+                      Colors.green,
+                      () {
+                        _launchWhatsApp(lead.countryCode, lead.phoneNumber);
+                      },
+                    ),
+                    const SizedBox(width: 4),
+                    _buildCompactActionIcon(
+                      Icons.history_rounded,
+                      Colors.orange,
+                      () async {
+                        final result = await Get.to(
+                          () => FollowupView(lead: lead),
+                        );
+                        if (result == true) {
+                          controller.fetchStudentLeads();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactActionIcon(
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, size: 18, color: color),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+    IconData icon,
+    String label,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: AppTheme.bodyText.copyWith(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade700,
+            ),
+          ),
         ],
       ),
     );

@@ -149,17 +149,8 @@ class EnquiryController extends GetxController {
         }).toList(),
       );
 
-      // Ensure unique IDs to prevent dropdown crashes
-      var uniqueStaff = <int, DropdownItem>{};
-      for (var s in staff) {
-        if (!uniqueStaff.containsKey(s.id)) {
-          uniqueStaff[s.id] = s;
-        }
-      }
-      staff.assignAll(uniqueStaff.values.toList());
-
       enquirySources.assignAll(
-        results[4]
+        _makeUnique(results[4]
             .map(
               (e) => DropdownItem.fromJson(
                 e,
@@ -167,11 +158,23 @@ class EnquiryController extends GetxController {
                 nameKey: 'Enquiry_Source_Name',
               ),
             )
-            .toList(),
+            .toList()),
       );
+      
+      // Apply uniqueness to all
+      branches.assignAll(_makeUnique(branches));
+      departments.assignAll(_makeUnique(departments));
+      statuses.assignAll(_makeUnique(statuses));
+      staff.assignAll(_makeUnique(staff));
+
     } finally {
       isDropdownLoading(false);
     }
+  }
+
+  List<DropdownItem> _makeUnique(List<DropdownItem> items) {
+    final ids = <int>{};
+    return items.where((item) => ids.add(item.id)).toList();
   }
 
   void initWithLead(StudentLead lead) {

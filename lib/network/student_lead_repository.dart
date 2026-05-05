@@ -30,6 +30,8 @@ class StudentLeadRepository {
 
       if (response.statusCode == 200) {
         debugPrint('--- STUDENT LEADS API RESPONSE ---');
+        debugPrint(response.data.toString());
+        debugPrint('-------------------');
         return StudentLeadResponseModel.fromJson(response.data);
       }
       return null;
@@ -111,6 +113,24 @@ class StudentLeadRepository {
       return response.statusCode == 200;
     } catch (e) {
       debugPrint('Exception in saveStudent: $e');
+      return false;
+    }
+  }
+
+  Future<bool> saveFollowup(Map<String, dynamic> data) async {
+    try {
+      debugPrint('--- SAVE FOLLOWUP REQUEST ---');
+      debugPrint('Data: $data');
+      
+      final response = await _apiClient.dio.post(ApiEndpoints.saveStudentFollowup, data: data);
+      
+      debugPrint('--- SAVE FOLLOWUP RESPONSE ---');
+      debugPrint(response.data.toString());
+      debugPrint('-------------------');
+      
+      return response.statusCode == 200 && response.data['success'] == true;
+    } catch (e) {
+      debugPrint('Exception in saveFollowup: $e');
       return false;
     }
   }

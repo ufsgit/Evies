@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controllers/login_controller.dart';
+import '../utils/app_theme.dart';
 import 'widgets/custom_text_field.dart';
 
 class LoginView extends StatelessWidget {
@@ -204,14 +205,7 @@ class LoginView extends StatelessWidget {
                                   elevation: 0,
                                 ),
                                 child: controller.isLoading.value
-                                    ? const SizedBox(
-                                        height: 20, // slightly smaller loader
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 2.0,
-                                        ),
-                                      )
+                                    ? AppTheme.loadingIndicator(size: 28)
                                     : Text(
                                         'Login',
                                         style: GoogleFonts.inter(

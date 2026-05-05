@@ -92,11 +92,9 @@ class DashboardView extends StatelessWidget {
           SliverToBoxAdapter(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Padding(
-                  padding: EdgeInsets.only(top: 100.0),
-                  child: Center(
-                    child: CircularProgressIndicator(color: Color(0xFF5C6BC0)),
-                  ),
+                return Padding(
+                  padding: const EdgeInsets.only(top: 100.0),
+                  child: AppTheme.loadingIndicator(),
                 );
               }
 
