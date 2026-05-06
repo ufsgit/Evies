@@ -21,5 +21,6 @@ class ApiEndpoints {
   static const String saveStudent = '$baseUrl/student/Save_student/';
   static const String getStudentCurrentFollowup =
       '$baseUrl/Student/Get_student_current_followup/';
-  static const String saveStudentFollowup = '$baseUrl/student/Save_student_followup/';
+  static const String saveStudentFollowup =
+      '$baseUrl/student/Save_student_followup/';
 }

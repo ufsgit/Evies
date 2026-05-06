@@ -88,74 +88,16 @@ class AppTheme {
     fontSize: 14,
   );
 
-  // Loading Indicator (Radial Gauge Design)
-  static Widget loadingIndicator({double size = 130}) {
-    double scale = size / 130;
+  // Loading Indicator (Clean Standard Design)
+  static Widget loadingIndicator({double size = 40}) {
     return Center(
-      child: Container(
+      child: SizedBox(
         width: size,
         height: size,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: primaryColor.withValues(alpha: 0.1),
-              blurRadius: 30 * scale,
-              offset: Offset(0, 15 * scale),
-            ),
-          ],
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Outer Gauge Ring
-            SizedBox(
-              width: 100 * scale,
-              height: 100 * scale,
-              child: CircularProgressIndicator(
-                strokeWidth: 10 * scale,
-                backgroundColor: Colors.grey.shade50,
-                valueColor: const AlwaysStoppedAnimation<Color>(primaryColor),
-              ),
-            ),
-            // Inner Annotations
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'AIVES',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16 * scale,
-                    fontWeight: FontWeight.w900,
-                    color: primaryColor,
-                    letterSpacing: 1.5 * scale,
-                  ),
-                ),
-                if (size > 80)
-                  Text(
-                    'Loading...',
-                    style: GoogleFonts.inter(
-                      fontSize: 11 * scale,
-                      fontWeight: FontWeight.w600,
-                      color: subtitleColor,
-                    ),
-                  ),
-              ],
-            ),
-            // Decorative 3D Dot
-            Positioned(
-              top: 15 * scale,
-              child: Container(
-                width: 6 * scale,
-                height: 6 * scale,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-          ],
+        child: const CircularProgressIndicator(
+          strokeWidth: 3,
+          valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+          backgroundColor: Color(0xFFF1F3F4),
         ),
       ),
     );

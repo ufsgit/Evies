@@ -8,7 +8,6 @@ import '../models/dashboard_model.dart';
 import '../utils/app_theme.dart';
 import 'login_view.dart';
 import 'student_lead_view.dart';
-import 'call_log_view.dart';
 
 class DashboardView extends StatelessWidget {
   DashboardView({super.key});

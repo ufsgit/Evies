@@ -21,29 +21,60 @@ class StudentLeadView extends StatelessWidget {
       if (await canLaunchUrl(url)) {
         await launchUrl(url);
       } else {
-        Get.snackbar('Error', 'Could not launch dialer');
+        Get.snackbar(
+          'Call Error',
+          'Could not launch dialer',
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(15),
+          icon: const Icon(Icons.error_outline, color: Colors.white),
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred');
+      Get.snackbar(
+        'Error',
+        'An error occurred',
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
     }
   }
 
   Future<void> _launchWhatsApp(String? countryCode, String phoneNumber) async {
     String cleanCode = (countryCode ?? '+91').replaceAll('+', '');
     String cleanPhone = phoneNumber.replaceAll(RegExp(r'\D'), '');
-    final Uri url = Uri.parse('https://wa.me/$cleanCode$cleanPhone');
+
+    // App schemes for both WhatsApp and WhatsApp Business usually respond to this
+    final Uri appUrl = Uri.parse('whatsapp://send?phone=$cleanCode$cleanPhone');
+    final Uri webUrl = Uri.parse('https://wa.me/$cleanCode$cleanPhone');
 
     try {
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
+      // We try launching the app scheme first. 
+      // Note: canLaunchUrl requires <queries> in AndroidManifest to work on Android 11+
+      if (await canLaunchUrl(appUrl)) {
+        await launchUrl(appUrl);
+      } else if (await canLaunchUrl(webUrl)) {
+        // Fallback to the deep link which handles redirection to either app
+        await launchUrl(webUrl, mode: LaunchMode.externalApplication);
       } else {
         Get.snackbar(
-          'Error',
-          'WhatsApp not installed or could not be launched',
+          'WhatsApp Error',
+          'WhatsApp is not installed on this device',
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(15),
+          icon: const Icon(Icons.error_outline, color: Colors.white),
         );
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred');
+      Get.snackbar(
+        'Error',
+        'An error occurred while launching WhatsApp',
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -425,152 +456,167 @@ class StudentLeadView extends StatelessWidget {
   }
 
   Widget _buildLeadCard(StudentLead lead) {
-    return Container(
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top Row: Name and Status
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    lead.fullName.toUpperCase(),
-                    style: AppTheme.bodyText.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () async {
-                    final result = await Get.to(
-                      () => EnquiryFormView(
-                        studentId: lead.studentId,
-                        lead: lead,
+    return InkWell(
+      onTap: () async {
+        final result = await Get.to(() => FollowupView(lead: lead));
+        if (result == true) {
+          controller.fetchStudentLeads();
+        }
+      },
+      child: Container(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Row: Name and Status
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      lead.fullName.toUpperCase(),
+                      style: AppTheme.bodyText.copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
                       ),
-                    );
-                    if (result == true) {
-                      controller.fetchStudentLeads();
-                    }
-                  },
-                  icon: const Icon(
-                    Icons.edit_outlined,
-                    size: 16,
-                    color: AppTheme.primaryColor,
-                  ),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8F5E9),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    lead.statusName,
-                    style: AppTheme.bodyText.copyWith(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF2E7D32),
                     ),
                   ),
-                ),
-              ],
-            ),
-
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Left Side: Phone and Remark
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Phone Number
-                      const SizedBox(height: 2),
-                      Text(
-                        lead.phoneNumber,
-                        style: AppTheme.subtitle.copyWith(
-                          fontSize: 13,
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w500,
+                  IconButton(
+                    onPressed: () async {
+                      final result = await Get.to(
+                        () => EnquiryFormView(
+                          studentId: lead.studentId,
+                          lead: lead,
                         ),
+                      );
+                      if (result == true) {
+                        controller.fetchStudentLeads();
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.edit_outlined,
+                      size: 16,
+                      color: AppTheme.primaryColor,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      lead.statusName,
+                      style: AppTheme.bodyText.copyWith(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF2E7D32),
                       ),
+                    ),
+                  ),
+                ],
+              ),
 
-                      // Remark
-                      if (lead.remark.isNotEmpty) ...[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Left Side: Phone and Remark
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Phone Number
                         const SizedBox(height: 2),
                         Text(
-                          lead.remark,
+                          lead.phoneNumber,
                           style: AppTheme.subtitle.copyWith(
-                            fontSize: 12,
-                            color: Colors.grey.shade500,
-                            fontStyle: FontStyle.italic,
+                            fontSize: 13,
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w500,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
+
+                        // Remark
+                        if (lead.remark.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            lead.remark,
+                            style: AppTheme.subtitle.copyWith(
+                              fontSize: 12,
+                              color: Colors.grey.shade500,
+                              fontStyle: FontStyle.italic,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ],
+                    ),
+                  ),
+
+                  // Right Side: Action Icons (Compact Row)
+                  Row(
+                    children: [
+                      _buildCompactActionIcon(
+                        Icons.call_outlined,
+                        Colors.blue,
+                        () {
+                          _makeCall(lead.phoneNumber);
+                        },
+                      ),
+                      const SizedBox(width: 12),
+                      _buildCompactActionIcon(
+                        null,
+                        Colors.green,
+                        () {
+                          _launchWhatsApp(lead.countryCode, lead.phoneNumber);
+                        },
+                        child: Image.network(
+                          'https://cdn-icons-png.flaticon.com/512/3670/3670051.png',
+                          width: 24,
+                          height: 24,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      _buildCompactActionIcon(
+                        Icons.history_rounded,
+                        Colors.orange,
+                        () async {
+                          final result = await Get.to(
+                            () => FollowupView(lead: lead),
+                          );
+                          if (result == true) {
+                            controller.fetchStudentLeads();
+                          }
+                        },
+                      ),
                     ],
                   ),
-                ),
-
-                // Right Side: Action Icons (Compact Row)
-                Row(
-                  children: [
-                    _buildCompactActionIcon(
-                      Icons.call_outlined,
-                      Colors.blue,
-                      () {
-                        _makeCall(lead.phoneNumber);
-                      },
-                    ),
-                    const SizedBox(width: 4),
-                    _buildCompactActionIcon(
-                      Icons.chat_bubble_outline_rounded,
-                      Colors.green,
-                      () {
-                        _launchWhatsApp(lead.countryCode, lead.phoneNumber);
-                      },
-                    ),
-                    const SizedBox(width: 4),
-                    _buildCompactActionIcon(
-                      Icons.history_rounded,
-                      Colors.orange,
-                      () async {
-                        final result = await Get.to(
-                          () => FollowupView(lead: lead),
-                        );
-                        if (result == true) {
-                          controller.fetchStudentLeads();
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildCompactActionIcon(
-    IconData icon,
+    IconData? icon,
     Color color,
-    VoidCallback onTap,
-  ) {
+    VoidCallback onTap, {
+    Widget? child,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
@@ -580,7 +626,7 @@ class StudentLeadView extends StatelessWidget {
           color: color.withOpacity(0.08),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 18, color: color),
+        child: child ?? Icon(icon, size: 22, color: color),
       ),
     );
   }
