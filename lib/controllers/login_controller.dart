@@ -47,6 +47,7 @@ class LoginController extends GetxController {
         await prefs.setString('jwt_token', response.token!);
         if (response.user != null) {
           await prefs.setInt('user_id', response.user!.id);
+          await prefs.setString('user_name', response.user!.firstName);
         }
       }
 

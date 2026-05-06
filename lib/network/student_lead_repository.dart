@@ -81,10 +81,24 @@ class StudentLeadRepository {
     try {
       final response = await _apiClient.dio.get(endpoint);
       if (response.statusCode == 200) {
-        if (response.data is List) {
-          return List<Map<String, dynamic>>.from(response.data);
-        } else if (response.data is Map && response.data.containsKey('data')) {
-          return List<Map<String, dynamic>>.from(response.data['data']);
+        dynamic data = response.data;
+        
+        // Handle nested list responses (common in this backend)
+        if (data is List) {
+          if (data.isNotEmpty && data[0] is List) {
+            for (var item in data) {
+              if (item is List && item.isNotEmpty && item[0] is Map) {
+                return List<Map<String, dynamic>>.from(item);
+              }
+            }
+          }
+          return data.whereType<Map<String, dynamic>>().toList();
+        } else if (data is Map) {
+          if (data.containsKey('data') && data['data'] is List) {
+            return List<Map<String, dynamic>>.from(data['data']);
+          }
+          // If it's a single map, wrap it in a list
+          return [data.cast<String, dynamic>()];
         }
       }
       return [];

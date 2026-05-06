@@ -78,26 +78,23 @@ class FollowupView extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildDropdownField(
-            label: 'Branch',
-            icon: Icons.account_tree_outlined,
-            items: controller.branches,
-            value: controller.selectedBranchId,
-          ),
+          Obx(() => _buildInbuiltField(
+            'Branch',
+            controller.getSelectedBranchName(),
+            Icons.account_tree_outlined,
+          )),
           const SizedBox(height: 16),
-          _buildDropdownField(
-            label: 'Department',
-            icon: Icons.business_outlined,
-            items: controller.departments,
-            value: controller.selectedDepartmentId,
-          ),
+          Obx(() => _buildInbuiltField(
+            'Department',
+            controller.getSelectedDepartmentName(),
+            Icons.business_outlined,
+          )),
           const SizedBox(height: 16),
-          _buildDropdownField(
-            label: 'Assign To Staff',
-            icon: Icons.person_add_alt_1_outlined,
-            items: controller.staff,
-            value: controller.selectedStaffId,
-          ),
+          Obx(() => _buildInbuiltField(
+            'Assign To Staff',
+            controller.getSelectedStaffName(),
+            Icons.person_add_alt_1_outlined,
+          )),
           const SizedBox(height: 16),
           _buildDropdownField(
             label: 'Follow-up Status',
@@ -152,6 +149,41 @@ class FollowupView extends StatelessWidget {
             fillColor: AppTheme.backgroundColor,
           ),
           style: AppTheme.bodyText.copyWith(fontSize: 14),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInbuiltField(String label, String value, IconData icon) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppTheme.subtitle.copyWith(fontSize: 12, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, size: 18, color: AppTheme.primaryColor),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  value, 
+                  style: AppTheme.bodyText.copyWith(
+                    fontSize: 14, 
+                    color: Colors.grey.shade700,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

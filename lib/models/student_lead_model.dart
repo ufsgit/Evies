@@ -41,7 +41,9 @@ class StudentLead {
   final int? age;
   final String? qualification;
   final int? branchId;
+  final String branchName;
   final int? departmentId;
+  final String departmentName;
   final int? enquirySourceId;
 
   StudentLead({
@@ -62,7 +64,9 @@ class StudentLead {
     this.age,
     this.qualification,
     this.branchId,
+    this.branchName = '',
     this.departmentId,
+    this.departmentName = '',
     this.enquirySourceId,
   });
 
@@ -70,8 +74,14 @@ class StudentLead {
   String get fullName => '$firstName $lastName';
 
   factory StudentLead.fromJson(Map<String, dynamic> json) {
+    int? toInt(dynamic v) {
+      if (v == null) return null;
+      if (v is int) return v;
+      return int.tryParse(v.toString());
+    }
+
     return StudentLead(
-      studentId: json['Student_ID'] ?? 0,
+      studentId: toInt(json['Student_ID']) ?? 0,
       firstName: json['First_Name'] ?? '',
       lastName: json['Last_Name'] ?? '',
       email: json['Email'] ?? '',
@@ -80,16 +90,18 @@ class StudentLead {
       countryCodeName: json['Country_Code_Name'] ?? 'India',
       followUpDate: json['Next_Follow_Up_Date'] ?? json['Follow_Up_Date'],
       statusName: json['Status_Name'] ?? 'Unknown',
-      statusId: json['Status_Id'] ?? json['Status_ID'] ?? json['Follow_Up_Status_ID'],
+      statusId: toInt(json['Status_Id'] ?? json['Status_ID'] ?? json['Follow_Up_Status_ID']),
       assignedStaffName: json['Assigned_Staff_Name'] ?? json['To_User_Name'] ?? '',
-      assignedStaffId: json['Assigned_Staff_ID'] ?? json['To_User_Id'],
+      assignedStaffId: toInt(json['Assigned_Staff_ID'] ?? json['To_User_Id']),
       remark: json['Remark'] ?? '',
       address: json['Address'] ?? json['Place'] ?? '',
-      age: json['Age'],
+      age: toInt(json['Age']),
       qualification: json['Qualification'] ?? '',
-      branchId: json['Branch_Id'] ?? json['Branch_ID'],
-      departmentId: json['Department_Id'] ?? json['Department_ID'],
-      enquirySourceId: json['Enquiry_Source_Id'] ?? json['Enquiry_Source_ID'],
+      branchId: toInt(json['Branch_Id'] ?? json['Branch_ID'] ?? json['BranchID'] ?? json['branch_id']),
+      branchName: json['Branch_Name'] ?? json['Branch'] ?? json['branch_name'] ?? '',
+      departmentId: toInt(json['Department_Id'] ?? json['Department_ID'] ?? json['DepartmentID'] ?? json['Dept_ID'] ?? json['DeptId'] ?? json['dept_id'] ?? json['Department_Id_'] ?? json['department_id']),
+      departmentName: json['Department_Name'] ?? json['Department'] ?? json['Dept_Name'] ?? json['dept_name'] ?? json['DepartmentName'] ?? json['dept'] ?? json['Department_Name_'] ?? json['department_name'] ?? '',
+      enquirySourceId: toInt(json['Enquiry_Source_Id'] ?? json['Enquiry_Source_ID'] ?? json['Source_ID']),
     );
   }
 

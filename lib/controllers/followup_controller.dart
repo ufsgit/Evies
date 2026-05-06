@@ -5,6 +5,7 @@ import '../models/enquiry_form_model.dart';
 import '../network/student_lead_repository.dart';
 import '../network/api_endpoints.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FollowupController extends GetxController {
   final StudentLeadRepository _repository = StudentLeadRepository();
@@ -15,6 +16,9 @@ class FollowupController extends GetxController {
 
   var isLoading = false.obs;
   var isDropdownLoading = true.obs;
+  
+  var loggedUserId = RxnInt();
+  var loggedUserName = Rxn<String>();
 
   // Form Fields
   var selectedBranchId = RxnInt();
@@ -35,8 +39,10 @@ class FollowupController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _loadLoggedUser();
     // Initialize with lead data
     selectedBranchId.value = lead.branchId;
+    selectedDepartmentId.value = lead.departmentId;
     selectedStaffId.value = lead.assignedStaffId;
     selectedStatusId.value = lead.statusId;
     if (lead.followUpDate != null) {
@@ -46,6 +52,41 @@ class FollowupController extends GetxController {
     }
     
     fetchDropdowns();
+    _fetchFullDetails();
+  }
+
+  Future<void> _fetchFullDetails() async {
+    try {
+      // Trying the followup details endpoint instead of the 404 search-by-id endpoint
+      final response = await _repository.fetchDropdown('${ApiEndpoints.getStudentCurrentFollowup}?student_Id=${lead.studentId}');
+      if (response.isNotEmpty) {
+        final data = response[0];
+        if (data is Map) {
+          if (selectedBranchId.value == null || selectedBranchId.value == 0) {
+            selectedBranchId.value = int.tryParse(data['Branch_Id']?.toString() ?? data['Branch_ID']?.toString() ?? data['Branch_Id_']?.toString() ?? '0');
+          }
+          if (selectedDepartmentId.value == null || selectedDepartmentId.value == 0) {
+            selectedDepartmentId.value = int.tryParse(data['Department_Id']?.toString() ?? data['Department_ID']?.toString() ?? data['Dept_Id']?.toString() ?? data['Department_Id_']?.toString() ?? '0');
+          }
+        }
+      }
+      
+      // Final safety: if still null but we have departments, try to match
+      _syncDepartmentByName();
+    } catch (e) {
+      debugPrint('Error fetching full details: $e');
+    }
+  }
+
+  Future<void> _loadLoggedUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    loggedUserId.value = prefs.getInt('user_id');
+    loggedUserName.value = prefs.getString('user_name');
+    
+    // Set default staff to logged user if no staff is assigned or it's a new follow-up
+    if (selectedStaffId.value == null || selectedStaffId.value == 0) {
+      selectedStaffId.value = loggedUserId.value;
+    }
   }
 
   Future<void> fetchDropdowns() async {
@@ -59,7 +100,16 @@ class FollowupController extends GetxController {
       ]);
 
       branches.assignAll(_makeUnique(results[0].map((e) => DropdownItem.fromJson(e, idKey: 'Branch_ID', nameKey: 'Branch_Name')).toList()));
-      departments.assignAll(_makeUnique(results[1].map((e) => DropdownItem.fromJson(e, idKey: 'Department_Id', nameKey: 'Department_Name')).toList()));
+      
+      // Explicit mapping for Department based on user provided JSON
+      departments.assignAll(_makeUnique(results[1].map((e) {
+        return DropdownItem(
+          id: int.tryParse(e['Department_Id']?.toString() ?? e['Department_ID']?.toString() ?? e['Dept_ID']?.toString() ?? '0') ?? 0,
+          name: (e['Department_Name'] ?? e['DepartmentName'] ?? e['name'] ?? 'Admission').toString(),
+        );
+      }).toList()));
+
+      _syncDepartmentByName();
       
       // Robust Staff Mapping
       staff.assignAll(_makeUnique(results[2].map((e) {
@@ -83,6 +133,20 @@ class FollowupController extends GetxController {
       Get.snackbar('Error', 'Failed to load dropdowns');
     } finally {
       isDropdownLoading.value = false;
+    }
+  }
+
+  void _syncDepartmentByName() {
+    if (departments.isNotEmpty && (selectedDepartmentId.value == null || selectedDepartmentId.value == 0)) {
+      // If there's only one department, or one named Admission, auto-select it
+      if (departments.length == 1) {
+        selectedDepartmentId.value = departments[0].id;
+      } else {
+        final match = departments.firstWhereOrNull((e) => e.name.toLowerCase().contains('admission'));
+        if (match != null) {
+          selectedDepartmentId.value = match.id;
+        }
+      }
     }
   }
 
@@ -124,6 +188,32 @@ class FollowupController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  String getSelectedBranchName() {
+    if (branches.isEmpty) return (lead.branchName != null && lead.branchName.isNotEmpty) ? lead.branchName : '-';
+    return branches.firstWhere(
+      (e) => e.id == (selectedBranchId.value ?? 0), 
+      orElse: () => DropdownItem(id: 0, name: (lead.branchName != null && lead.branchName.isNotEmpty) ? lead.branchName : '-')
+    ).name;
+  }
+
+  String getSelectedDepartmentName() {
+    if (departments.isEmpty) return (lead.departmentName != null && lead.departmentName.isNotEmpty) ? lead.departmentName : '-';
+    return departments.firstWhere(
+      (e) => e.id == (selectedDepartmentId.value ?? 0), 
+      orElse: () => DropdownItem(id: 0, name: (lead.departmentName != null && lead.departmentName.isNotEmpty) ? lead.departmentName : '-')
+    ).name;
+  }
+
+  String getSelectedStaffName() {
+    // If it's the logged user, return their name
+    if (selectedStaffId.value == loggedUserId.value && loggedUserName.value != null) {
+      return loggedUserName.value!;
+    }
+    // Otherwise look up in staff list
+    if (selectedStaffId.value == null) return 'Not Set';
+    return staff.firstWhere((e) => e.id == selectedStaffId.value, orElse: () => DropdownItem(id: 0, name: 'Not Found')).name;
   }
 
   @override
