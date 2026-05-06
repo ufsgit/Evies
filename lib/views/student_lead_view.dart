@@ -117,7 +117,7 @@ class StudentLeadView extends StatelessWidget {
           // Search Bar & Filters Inset
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
               child: Column(
                 children: [
                   // Search Field
@@ -466,7 +466,7 @@ class StudentLeadView extends StatelessWidget {
       child: Container(
         color: Colors.white,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -582,8 +582,8 @@ class StudentLeadView extends StatelessWidget {
                         },
                         child: Image.network(
                           'https://cdn-icons-png.flaticon.com/512/3670/3670051.png',
-                          width: 24,
-                          height: 24,
+                          width: 28,
+                          height: 28,
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -621,12 +621,12 @@ class StudentLeadView extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: color.withOpacity(0.08),
           shape: BoxShape.circle,
         ),
-        child: child ?? Icon(icon, size: 22, color: color),
+        child: child ?? Icon(icon, size: 26, color: color),
       ),
     );
   }
