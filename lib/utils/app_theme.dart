@@ -102,4 +102,22 @@ class AppTheme {
       ),
     );
   }
+
+  // Standardized Empty State
+  static Widget emptyState(String message, {IconData icon = Icons.inbox_rounded}) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 64, color: Colors.grey.shade300),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: h1.copyWith(color: Colors.grey.shade400, fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
 }

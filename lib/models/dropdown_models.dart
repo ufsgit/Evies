@@ -5,8 +5,13 @@ class BranchModel {
   BranchModel({required this.id, required this.name});
 
   factory BranchModel.fromJson(Map<String, dynamic> json) {
+    int? toInt(dynamic v) {
+      if (v == null) return null;
+      if (v is int) return v;
+      return int.tryParse(v.toString());
+    }
     return BranchModel(
-      id: json['Branch_ID'] ?? json['Id'] ?? 0,
+      id: toInt(json['Branch_ID'] ?? json['Id']) ?? 0,
       name: json['Branch_Name'] ?? json['Name'] ?? '',
     );
   }
@@ -19,8 +24,13 @@ class StaffModel {
   StaffModel({required this.id, required this.name});
 
   factory StaffModel.fromJson(Map<String, dynamic> json) {
+    int? toInt(dynamic v) {
+      if (v == null) return null;
+      if (v is int) return v;
+      return int.tryParse(v.toString());
+    }
     return StaffModel(
-      id: json['User_ID'] ?? json['Id'] ?? 0,
+      id: toInt(json['User_ID'] ?? json['Id']) ?? 0,
       name: json['User_Name'] ?? json['First_Name'] ?? '',
     );
   }
@@ -33,8 +43,13 @@ class FollowupStatusModel {
   FollowupStatusModel({required this.id, required this.name});
 
   factory FollowupStatusModel.fromJson(Map<String, dynamic> json) {
+    int? toInt(dynamic v) {
+      if (v == null) return null;
+      if (v is int) return v;
+      return int.tryParse(v.toString());
+    }
     return FollowupStatusModel(
-      id: json['Status_Id'] ?? json['Id'] ?? 0,
+      id: toInt(json['Status_Id'] ?? json['Id']) ?? 0,
       name: json['Status_Name'] ?? json['Name'] ?? '',
     );
   }

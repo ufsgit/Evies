@@ -8,6 +8,12 @@ import '../models/dashboard_model.dart';
 import '../utils/app_theme.dart';
 import 'login_view.dart';
 import 'student_lead_view.dart';
+import 'enquiry_summary_view.dart';
+import 'student_report_view.dart';
+import 'outstanding_fees_view.dart';
+import 'upcoming_installment_view.dart';
+import 'work_report_view.dart';
+import 'enquiry_conversion_view.dart';
 
 class DashboardView extends StatelessWidget {
   DashboardView({super.key});
@@ -239,12 +245,34 @@ class DashboardView extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 10),
               children: [
                 _buildDrawerItem(Icons.dashboard_rounded, 'Dashboard', true),
-                _buildDrawerItem(Icons.school_rounded, 'My Courses', false),
+                _buildDrawerItem(Icons.analytics_rounded, 'Enquiry Summary', false, onTap: () {
+                  Get.back();
+                  Get.to(() => EnquirySummaryView());
+                }),
+                _buildDrawerItem(Icons.description_outlined, 'Student Reports', false, onTap: () {
+                  Get.back();
+                  Get.to(() => StudentReportView());
+                }),
+                _buildDrawerItem(Icons.account_balance_wallet_outlined, 'Outstanding Fees', false, onTap: () {
+                  Get.back();
+                  Get.to(() => OutstandingFeesView());
+                }),
+                _buildDrawerItem(Icons.event_note_rounded, 'Upcoming Installment', false, onTap: () {
+                  Get.back();
+                  Get.to(() => UpcomingInstallmentView());
+                }),
+                _buildDrawerItem(Icons.assignment_turned_in_rounded, 'Work Report', false, onTap: () {
+                  Get.back();
+                  Get.to(() => WorkReportView());
+                }),
+                _buildDrawerItem(Icons.pie_chart_rounded, 'Enquiry Conversion', false, onTap: () {
+                  Get.back();
+                  Get.to(() => EnquiryConversionView());
+                }),
                 _buildDrawerItem(Icons.people_rounded, 'Student Leads', false, onTap: () {
                   Get.back();
                   Get.to(() => StudentLeadView());
                 }),
-                _buildDrawerItem(Icons.analytics_rounded, 'Reports', false),
                 _buildDrawerItem(Icons.settings_rounded, 'Settings', false),
                 const Divider(indent: 20, endIndent: 20),
                 _buildDrawerItem(

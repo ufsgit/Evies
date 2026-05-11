@@ -45,6 +45,11 @@ class StudentLead {
   final int? departmentId;
   final String departmentName;
   final int? enquirySourceId;
+  final String? batchName;
+  final String? outstandingAmount;
+  final int? isActive;
+  final String? nextDueDate;
+  final String? upcomingAmount;
 
   StudentLead({
     required this.studentId,
@@ -68,6 +73,11 @@ class StudentLead {
     this.departmentId,
     this.departmentName = '',
     this.enquirySourceId,
+    this.batchName,
+    this.outstandingAmount,
+    this.isActive,
+    this.nextDueDate,
+    this.upcomingAmount,
   });
 
 
@@ -89,7 +99,7 @@ class StudentLead {
       countryCode: json['Country_Code'] ?? '+91',
       countryCodeName: json['Country_Code_Name'] ?? 'India',
       followUpDate: json['Next_Follow_Up_Date'] ?? json['Follow_Up_Date'],
-      statusName: json['Status_Name'] ?? 'Unknown',
+      statusName: json['Status_Name'] ?? json['Followup_Status'] ?? json['Follow_Up_Status'] ?? 'Unknown',
       statusId: toInt(json['Status_Id'] ?? json['Status_ID'] ?? json['Follow_Up_Status_ID']),
       assignedStaffName: json['Assigned_Staff_Name'] ?? json['To_User_Name'] ?? '',
       assignedStaffId: toInt(json['Assigned_Staff_ID'] ?? json['To_User_Id']),
@@ -102,6 +112,11 @@ class StudentLead {
       departmentId: toInt(json['Department_Id'] ?? json['Department_ID'] ?? json['DepartmentID'] ?? json['Dept_ID'] ?? json['DeptId'] ?? json['dept_id'] ?? json['Department_Id_'] ?? json['department_id']),
       departmentName: json['Department_Name'] ?? json['Department'] ?? json['Dept_Name'] ?? json['dept_name'] ?? json['DepartmentName'] ?? json['dept'] ?? json['Department_Name_'] ?? json['department_name'] ?? '',
       enquirySourceId: toInt(json['Enquiry_Source_Id'] ?? json['Enquiry_Source_ID'] ?? json['Source_ID']),
+      batchName: json['Batch_Name'] ?? json['batch_name'],
+      outstandingAmount: json['Outstanding_Amount']?.toString(),
+      isActive: toInt(json['isActive'] ?? json['Is_Active'] ?? json['IsActive']),
+      nextDueDate: json['Next_Due_Date'] ?? json['next_due_date'],
+      upcomingAmount: json['Upcoming_Amount']?.toString() ?? json['upcoming_amount']?.toString(),
     );
   }
 

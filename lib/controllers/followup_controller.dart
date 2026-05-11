@@ -68,6 +68,34 @@ class FollowupController extends GetxController {
           if (selectedDepartmentId.value == null || selectedDepartmentId.value == 0) {
             selectedDepartmentId.value = int.tryParse(data['Department_Id']?.toString() ?? data['Department_ID']?.toString() ?? data['Dept_Id']?.toString() ?? data['Department_Id_']?.toString() ?? '0');
           }
+          
+          // Staff Id
+          if (selectedStaffId.value == null || selectedStaffId.value == 0 || selectedStaffId.value == loggedUserId.value) {
+            var staffId = int.tryParse(data['Assigned_Staff_ID']?.toString() ?? data['User_Id']?.toString() ?? data['To_User_Id']?.toString() ?? '0');
+            if (staffId != null && staffId > 0) selectedStaffId.value = staffId;
+          }
+
+          // Status Id
+          var statusId = int.tryParse(data['Follow_Up_Status_Id']?.toString() ?? data['Follow_Up_Status_ID']?.toString() ?? data['Status_Id']?.toString() ?? data['Status_ID']?.toString() ?? '0');
+          print('DEBUG: Fetched Status ID from API = $statusId');
+          if (statusId != null && statusId > 0) {
+            selectedStatusId.value = statusId;
+          }
+
+          // Followup Date
+          if (selectedDate.value == null) {
+            var dateStr = data['Next_Follow_Up_Date']?.toString() ?? data['FollowUp_Date']?.toString();
+            if (dateStr != null && dateStr.isNotEmpty) {
+              try {
+                selectedDate.value = DateTime.parse(dateStr);
+              } catch (_) {}
+            }
+          }
+
+          // Remark
+          if (remarkController.text.isEmpty) {
+             remarkController.text = data['Remark']?.toString() ?? data['Followup_Remark']?.toString() ?? '';
+          }
         }
       }
       
@@ -120,8 +148,12 @@ class FollowupController extends GetxController {
       // Robust Status Mapping
       statuses.assignAll(_makeUnique(results[3].map((e) {
         String name = (e['Status_Name'] ?? e['Follow_Up_Status_Name'] ?? e['name'] ?? 'Status').toString();
-        return DropdownItem(id: e['Status_Id'] ?? e['Status_ID'] ?? e['Follow_Up_Status_ID'] ?? 0, name: name);
+        int id = int.tryParse(e['Status_Id']?.toString() ?? e['Status_ID']?.toString() ?? e['Follow_Up_Status_ID']?.toString() ?? '0') ?? 0;
+        return DropdownItem(id: id, name: name);
       }).toList()));
+
+      print('DEBUG: Extracted Dropdown Status IDs: ${statuses.map((e) => "${e.name}=${e.id}").toList()}');
+      print('DEBUG: Current selectedStatusId.value = ${selectedStatusId.value}');
       
       // Mock templates for now as per image
       templates.assignAll([
@@ -129,10 +161,25 @@ class FollowupController extends GetxController {
         DropdownItem(id: 2, name: 'Registration Link'),
       ]);
 
+      _syncStatusByName();
+
     } catch (e) {
       Get.snackbar('Error', 'Failed to load dropdowns');
     } finally {
       isDropdownLoading.value = false;
+    }
+  }
+
+  void _syncStatusByName() {
+    if (statuses.isNotEmpty && (selectedStatusId.value == null || selectedStatusId.value == 0)) {
+      String targetName = lead.statusName.trim().toLowerCase();
+      if (targetName.isNotEmpty && targetName != 'unknown') {
+        final match = statuses.firstWhereOrNull((e) => e.name.trim().toLowerCase() == targetName);
+        if (match != null) {
+          selectedStatusId.value = match.id;
+          print('DEBUG: Matched Status ID by Name: ${match.name} -> ${match.id}');
+        }
+      }
     }
   }
 
